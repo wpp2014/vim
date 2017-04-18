@@ -38,14 +38,14 @@ endif
 
 " The following are commented out as they cause vim to behave a lot
 " differently from regular Vi. They are highly recommended though.
-"set showcmd		" Show (partial) command in status line.
-"set showmatch		" Show matching brackets.
-"set ignorecase		" Do case insensitive matching
-"set smartcase		" Do smart case matching
-"set incsearch		" Incremental search
-"set autowrite		" Automatically save before commands like :next and :make
-"set hidden		" Hide buffers when they are abandoned
-"set mouse=a		" Enable mouse usage (all modes)
+"set showcmd      " Show (partial) command in status line.
+"set showmatch    " Show matching brackets.
+"set ignorecase   " Do case insensitive matching
+"set smartcase    " Do smart case matching
+"set incsearch    " Incremental search
+"set autowrite    " Automatically save before commands like :next and :make
+"set hidden       " Hide buffers when they are abandoned
+"set mouse=a      " Enable mouse usage (all modes)
 
 " Source a global configuration file if available
 if filereadable("/etc/vim/vimrc.local")
@@ -158,6 +158,57 @@ map <Down> <Nop>
 "==========================================
 " 显示状态栏
 set laststatus=2
+
+"==========================================
+" 括号自动补全
+inoremap ( ()<LEFT>
+inoremap [ []<LEFT>
+inoremap { {}<LEFT>
+inoremap " ""<LEFT>
+inoremap ' ''<LEFT>
+inoremap < <><LEFT>
+
+function! RemovePairs()
+  let s:line = getline(".")
+  let s:previous_char = s:line[col(".")-1]
+
+  if index(["(","[","{"],s:previous_char) != -1
+    let l:original_pos = getpos(".")
+    execute "normal %"
+    let l:new_pos = getpos(".")
+    " only right (
+    if l:original_pos == l:new_pos
+      execute "normal! a\<BS>"
+      return
+    end
+
+    let l:line2 = getline(".")
+    if len(l:line2) == col(".")
+      execute "normal! v%xa"
+    else
+      execute "normal! v%xi"
+    end
+  else
+    execute "normal! a\<BS>"
+  end
+endfunction
+
+function! RemoveNextDoubleChar(char)
+  let l:line = getline(".")
+  let l:next_char = l:line[col(".")]
+
+  if a:char == l:next_char
+    execute "normal! l"
+  else
+    execute "normal! i" . a:char . ""
+  end
+endfunction
+
+inoremap <BS> <ESC>:call RemovePairs()<CR>a
+inoremap ) <ESC>:call RemoveNextDoubleChar(')')<CR>a
+inoremap ] <ESC>:call RemoveNextDoubleChar(']')<CR>a
+inoremap } <ESC>:call RemoveNextDoubleChar('}')<CR>a
+inoremap > <ESC>:call RemoveNextDoubleChar('>')<CR>a
 
 "==========================================
 " 插件设置
