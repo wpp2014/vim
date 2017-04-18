@@ -118,6 +118,8 @@ set smarttab
 set expandtab
 " 缩进时，取整
 set shiftround
+" 禁止搜索到末端时重新搜索
+set nowrapscan
 
 "==========================================
 " FileEncode Settings 文件编码,格式
