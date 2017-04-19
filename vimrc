@@ -52,6 +52,39 @@ if filereadable("/etc/vim/vimrc.local")
   source /etc/vim/vimrc.local
 endif
 
+" 判断操作系统类型
+if(has('win32') || has('win64'))
+  let g:isWIN = 1
+  let g:isMAC = 0
+else
+  if system('uname') =~ 'Darwin'
+    let g:isWIN = 0
+    let g:isMAC = 1
+  else
+    let g:isWIN = 0
+    let g:isMAC = 0
+  endif
+endif
+
+" 判断是否处于GUI界面
+if has('gui_running')
+  let g:isGUI = 1
+else
+  let g:isGUI = 0
+endif
+
+" 设置着色模式和字体
+if g:isWIN
+  colorscheme molokai
+  set guifont=Monaco:h11
+elseif g:isMAC
+  colorscheme molokai
+  set guifont=Monaco:h14
+else
+  colorscheme molokai
+  set guifont=Monaco\ 11
+endif
+
 " 检测文件类型
 filetype on
 " 针对不同的文件类型采用不同的缩进格式
