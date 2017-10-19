@@ -52,6 +52,11 @@ if filereadable("/etc/vim/vimrc.local")
   source /etc/vim/vimrc.local
 endif
 
+" ---------- Leader 系按键 ----------
+" \rb                      一键去除全部尾部空白
+" \rm                      一键去除全部 ^M 字符
+" \rt                      一键替换全部 Tab 为空格
+
 " 判断操作系统类型
 if(has('win32') || has('win64'))
   let g:isWIN = 1
@@ -81,8 +86,32 @@ elseif g:isMAC
   colorscheme molokai
   set guifont=Monaco:h14
 else
-  colorscheme molokai
-  set guifont=Monaco\ 11
+  if g:isGUI
+    colorscheme molokai
+    set guifont=Monospace\ Regular\ 12
+  else
+    colorscheme molokai
+    set guifont=Monaco\ 11
+  endif
+endif
+
+" 使用GUI界面时的设置
+if g:isGUI
+  " 启动时自动最大化窗口
+  if g:isWIN
+    au GUIEnter * simalt ~x
+  endif
+  winpos 600 350              " 指定窗口出现的位置，坐标原点在屏幕左上角
+  set lines=25 columns=100   " 指定窗口大小，lines 为高度，columns 为宽度
+  set guioptions+=c          " 使用字符提示框
+  set guioptions-=m          " 隐藏菜单栏
+  set guioptions-=T          " 隐藏工具栏
+  set guioptions-=L          " 隐藏左侧滚动条
+  set guioptions-=r          " 隐藏右侧滚动条
+  set guioptions-=b          " 隐藏底部滚动条
+  set showtabline=0          " 隐藏Tab栏
+  set cursorline             " 高亮突出当前行
+  " set cursorcolumn         " 高亮突出当前列
 endif
 
 " 检测文件类型
@@ -102,7 +131,7 @@ set nobackup
 set noswapfile
 
 " 突出显示当前行
-" set cursorline
+set cursorline
 " 突出显示当前列
 " set cursorcolumn
 
@@ -140,7 +169,7 @@ set nowrapscan
 " set smartindent
 " 打开自动缩进
 set autoindent
-set cindent
+" set cindent
 
 " 设置Tab的宽度 [等同的空格个数]
 set tabstop=2
@@ -153,6 +182,12 @@ set smarttab
 set expandtab
 " 缩进时，取整
 set shiftround
+
+set list                     " 显示特殊字符，其中Tab使用高亮~代替，尾部空白使用高亮点号代替
+set listchars=tab:\~\ ,trail:.
+
+au FileType php,python set shiftwidth=2
+au FileType php,python set tabstop=2
 
 "==========================================
 " FileEncode Settings 文件编码,格式
@@ -257,9 +292,9 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 " Plugin 'powerline/powerline'
 Plugin 'Lokaltog/vim-powerline'
-Plugin 'jiangmiao/auto-pairs'
+" Plugin 'jiangmiao/auto-pairs'
 " Plugin 'altercation/vim-colors-solarized'
-Plugin 'tomasr/molokai'
+" Plugin 'tomasr/molokai'
 " Plugin 'vim-scripts/phd'
 " Plugin 'Lokaltog/vim-powerline'
 " Plugin 'octol/vim-cpp-enhanced-highlight'
@@ -295,3 +330,15 @@ set noshowmode
 set t_Co=256
 let g:Powerline_symbols='unicode'
 
+" \rb                 一键去除全部尾部空白
+imap <leader>rb <esc>:let _s=@/<bar>:%s/\s\+$//e<bar>:let @/=_s<bar>:nohl<cr>
+nmap <leader>rb :let _s=@/<bar>:%s/\s\+$//e<bar>:let @/=_s<bar>:nohl<cr>
+vmap <leader>rb <esc>:let _s=@/<bar>:%s/\s\+$//e<bar>:let @/=_s<bar>:nohl<cr>
+
+" \rm                 一键去除全部 ^M 字符
+imap <leader>rm <esc>:%s/<c-v><c-m>//g<cr>
+nmap <leader>rm :%s/<c-v><c-m>//g<cr>
+vmap <leader>rm <esc>:%s/<c-v><c-m>//g<cr>
+
+" \rt                 一键替换全部 Tab 为空格
+nmap <leader>rt <esc>:retab<cr>
